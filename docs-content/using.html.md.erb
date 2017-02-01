@@ -3,11 +3,24 @@ title: Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This topic describes how to use Dyadic EKM Service Broker for PCF.
-
 ##<a id='using'></a> Using Dyadic EKM Service Broker for PCF
 
-**This topic should include any instructions for how to use the service or dashboard created by the tile. Give procedures for how to perform the different functions offered by your product, and provide screenshots where necessary.** 
+### EKM at a Glance
+
+Dyadic Enterprise Key Management **(EKM)** provides a scalable key management platform for both virtualized and non-virtualized environments. Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and integration of the dedicated hardware elements (Hardware Security Modules). 
+
+Some notable features of the Dyadic EKM are: 
+
+1. It supports all standard RSA and ECC keys while remaining transparent to the application 
+
+1. It transparently supports standard crypto-API’s: KMIP, PKCS#11, Microsoft CNG, OpenSSL. 
+
+1. It is platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace. 
+
+1. Its installation does not disrupt the existing workflow of applications.
+
+1. It provides lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation.
+
 
 ### Developing in Java using Dyadic Provider
 
@@ -117,22 +130,4 @@ byte[] dec = encryptCipherDecrypt.doFinal(enc);
 
 
 ```
-
-#### Using AES CCM in Java
-
-As the standard Java implementation, does not include support for CCM - mainly for the additional mode parameters (IV, tag, and AD) - the Dyadic provider introduces a new parameter-specification class to be used when encrypting with AES CCM. The class name is `com.dyadicsec.provider.CcmParameterSpec`. The following code snippet demonstrates its usage when encrypting with AES:
-
-```java
-byte[] data = new byte[32];
-byte[] iv = new byte[12];
-byte[] AD = new byte[12];
-CcmParameterSpec ccmParameterSpec = new CcmParameterSpec(iv,12,AD);
-Cipher encryptCipherEncrypt = Cipher.getInstance("AES/CCM/NoPadding");
-encryptCipherEncrypt.init(Cipher.ENCRYPT_MODE, secretKey, ccmParameterSpec);
-byte[] enc = encryptCipherEncrypt.doFinal(data); 
-
-```
-
-The tag value is concatenated to the end of the encrypted data, returned from the `doFinal` function.
-
 
