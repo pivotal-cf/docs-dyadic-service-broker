@@ -1,36 +1,37 @@
 ---
-title: YOUR-PRODUCT-NAME
+title: Dyadic EKM Service Broker for PCF 1.2
 owner: Partners
 ---
 
 **This topic should begin with a brief description of your product. See below for an example.**
 
-This documentation describes the Redis Labs Enterprise Cluster (RLEC) Service Broker for Pivotal Cloud Foundry (PCF). 
-The RLEC Service Broker registers a service broker on PCF and exposes its service plans on the Marketplace. 
-Developers can provision Redis databases by creating instances of the service plans using Apps Manager or the cf CLI.
+This documentation describes the Dyadic Enterprise Key Management (EKM) Service Broker for Pivotal Cloud Foundry (PCF). 
+The EKM Service Broker registers a service broker on PCF and exposes its service plans on the Marketplace. 
+///AMY/// Developers can store and manage cryptographic keys in a pure-software solution that provides the same strong levels of seuciryt hardware.. AMYMAMY Any key Any cloud ///AMY//// by creating instances of the service plans using Apps Manager or the cf CLI.
 
 ## <a id='overview'></a>Overview
 
 **The overview should provide a description of the product's key features.**
 
-YOUR-PRODUCT-NAME includes the following key features:
+Dyadic EKM Service Broker for PCF includes the following key features:
 
-* Feature one.
-* Feature two.
-* Feature three.
+* Hardware level security - without hardware.
+* Elastic and easily scalable.
+* Supports all cloud providers.
+* Supports all standard crypto algorithms and APIs
 
 ## <a id="snapshot"></a>Product Snapshot
 
 <dl>
-<dt>YOUR-PRODUCT-NAME details:</dt>
-<dd><strong>Version</strong>: vYOUR-VERSION-NUMBER </dd>
-<dd><strong>Release date</strong>: YOUR-RELEASE-DATE (Ex: August 1 2016)</dd>
-<dd><strong>Software component version</strong>: vYOUR-SOFTWARE-COMPONENT-VERSION-NUMBER</dd>
-<dd><strong>Compatible Ops Manager version(s)</strong>: vYOUR-COMPATIBLE-OPS-MAN-VERSION (Ex. v1.6.x, v1.7.x)</dd>
-<dd><strong>Compatible Elastic Runtime version(s)</strong>: vYOUR-COMPATIBLE-ELASTIC-RUNTIME-VERSION (Ex. v1.4.x, v1.5.x, v1.6.x)</dd>
-<dd><strong>vSphere support?</strong> YES-OR-NO</dd>
-<dd><strong>OpenStack support?</strong> YES-OR-NO</dd>
-<dd><strong>AWS support?</strong> YES-OR-NO</dd>
+<dt>Dyadic EKM Service Broker for PCF details:</dt>
+<dd><strong>Version</strong>: v1.2 </dd>
+<dd><strong>Release date</strong>: February 1 2017</dd>
+<dd><strong>Software component version</strong>: v1.2.11756.1694</dd>
+<dd><strong>Compatible Ops Manager version(s)</strong>: v1.2.11756.1694</dd>
+<dd><strong>Compatible Elastic Runtime version(s)</strong>: v1.2.11756.1694</dd>
+<dd><strong>vSphere support?</strong> YES</dd>
+<dd><strong>OpenStack support?</strong> YES</dd>
+<dd><strong>AWS support?</strong> YES</dd>
 </dl>
 
 ## <a id="reqs"></a>Requirements
@@ -39,21 +40,30 @@ YOUR-PRODUCT-NAME includes the following key features:
 A general requirement might be something like, "An AppDynamics account." 
 A specific requirement might be something like, "Packaging Dependencies for Offline Buildpacks."**
 
-YOUR-PRODUCT-NAME has the following requirements:
+Dyadic EKM Service Broker for PCF has the following requirements:
 
-+ PREREQUISITE-1
++ OpenSSL
 
-+ PREREQUISITE-2
++ libapr version 1.3 or newer must be installed prior to installing the EKM Client To install libapr on Red Hat use the following command: sudo yum install apr
 
 ## <a id="limitations"></a>Limitations
 
 **List any known limitations.**
+<dl>
+<dt>EKM Client runs on the following Operating Systems:</dt>
+<dd>Windows Version 7, 8.1, 10 (32) and (64)</dd>
+<dd>Windows Version 2008 R2 (64)</dd>
+<dd>Windows Version 2012 R2 (64)</dd>
+<dd>Linux RHEL 6.5 (32) and (64) and up</dd>
+<dd>Linux CentOS 6.5 (64) and up</dd>
+<dd>Ubuntu 12.04 (64) and up</dd>
+</dl>
 
 ## <a id="feedback"></a>Feedback
 
-Please provide any bugs, feature requests, or questions to the [Pivotal Cloud Foundry Feedback](mailto:pivotal-cf-feedback@pivotal.io) list or send an email to YOUR-SUPPORT-EMAIL.
+Please provide any bugs, feature requests, or questions to the [Pivotal Cloud Foundry Feedback](mailto:pivotal-cf-feedback@pivotal.io) list or send an email to support@dyadicsec.com. 
 
 ## <a id='license'></a>License
 
 **List any license information here.**
-
+There are no license requirements on the client
