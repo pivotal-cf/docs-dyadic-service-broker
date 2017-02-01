@@ -1,12 +1,185 @@
 ---
-title: Using YOUR-PRODUCT-NAME
+title: Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This topic describes how to use YOUR-PRODUCT-NAME.
+This topic describes how to use Dyadic EKM Service Broker for PCF.
 
-##<a id='using'></a> Using YOUR-PRODUCT-NAME
+##<a id='using'></a> Using Dyadic EKM Service Broker for PCF
 
 **This topic should include any instructions for how to use the service or dashboard created by the tile. Give procedures for how to perform the different functions offered by your product, and provide screenshots where necessary.** 
 
-**You can also use this section to include information about Architecture and Troubleshooting for known errors. If you include a Troubleshooting section, follow the Symptom/Explanation format used in the [Okta Troubleshooting](http://docs.pivotal.io/p-identity/okta/troubleshooting.html) topic**.
+#### EKM at a Glance
+
+Dyadic Enterprise Key Management **(EKM)** provides a scalable key management platform for both virtualized and non-virtualized environments. Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and integration of the dedicated hardware elements (Hardware Security Modules). 
+
+Some notable features of the Dyadic EKM are:
+1. It supports all standard RSA and ECC keys while remaining transparent to the application 
+2. It transparently supports standard crypto-API’s: KMIP, PKCS#11, Microsoft CNG, OpenSSL.  
+3. It provides SDKs for .NET, Java, Python and PHP. 
+4. It is platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace. 
+5. Its installation does not disrupt the existing workflow of applications. 
+5. It provides lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation.
+
+#### EKM at a Glance
+
+EKM enhancement of the standard crypto API’s (besides KMIP) requires the installation of the Dyadic EKM Client on the target or development system. The EKM Client includes SDK and libraries, which allow integration, management and communication with the cryptographic services provided by EKM.
+
+The EKM Client supports the following platforms:
+
+**Windows**
+- 7 (32)
+- 7 (64)
+- 8.1 (32)
+- 8.1 (64)
+- 10 (32)
+- 10 (64)
+- 2003 (32)
+- 2003 (64)
+- 2008 R2 (64)
+- 2012 R2 (64)
+
+**Linux**
+- Ubuntu 12.04 (64)
+- RHEL 6.5 (64)
+- CentOS 6.5 (64)
+- Suse 11 SP3 (64)
+- RHEL 6.5 (32)
+
+Choose the appropriate SDK, based on your development environment. If you are using a development environment that is not described in this document, contact Dyadic.
+The EKM Client contains CL module (dsmcl). It allows you to connect to the EKM Server(s), create and review the status of cryptographic keys, install certificates, and more. 
+Connect your system to EKM Servers to start testing applications which use the EKM cryptographic services. 
+
+### Developing in C/C++
+If you use C/C++,  you can select one of the following SDKs to use  EKM Client functionality: __OpenSSL__ and __PKCS 11__. 
+The OpenSSL SDK is simpler than PKCS11. It supports sufficient cryptographic operations for most applications. However, unless you already use an application that makes use of OpenSSL, we recommend using PKCS11 since it is a more generic and complete API. 
+
+#### Interworking with OpenSSL
+##### Engine
+The OpenSSL library supports the extension of its functionality using engines. An engine allows enhancing the "standard" method to store crypto-keys and implement cryptography protocols. (In the "standard" mode, keys are stored as files and located in memory when used.)
+
+**Dyadic OpenSSL engine** enhances storage and retrieval of RSA and EC (ECDH and ECDSA) crypto-keys. 
+
+##### Supported OpenSSL Versions
+- Linux: Linux distributions include OpenSSL as part of the distribution. EKM Client contains required extensions to the standard OpenSSL provided with the Linux. If you are looking for support for a non-default OpenSSL distribution, please contact Dyadic.
+
+- Windows: OpenSSL on Windows is less common than PKCS11. However, if you would like to use it, we recommend using the OpenSSL version provided with the Dyadic EKM Client. It is enhancement of OpenSSL v1.0.2 located in C:\Program Files \DyadicSec\bin\win64. 
+
+##### Installing and Configuring EKM OpenSSL Engine
+Installation of the EKM Client on Linux platforms, by default, sets the **Dyadic OpenSSL** as the default library to be used by applications on the installed system. There is an installation option which allows you to control the EKM OpenSSL settings. 
+
+If you have excluded **Dyadic OpenSSL** during installation, you can always use the dy_openssl command to add it when needed.
+
+The Dyadic OpenSSL settings apply to all applications which use the global OpenSSL configuration file, such as the OpenSSL command line, the SSH server, the Web servers, and others. The following table displays where to find the file in two Linux distributions:
+
+| Linux distribution       | Use this file         |
+| ------------- |:-------------:|
+| Debian      | /etc/ssl/openssl.cnf |
+| Fedora     | /etc/pki/tls/openssl.cnf     |
+
+##### Updating Custom OpenSSL Configuration File
+
+If your application is not using the default OpenSSL configuration file - use the following settings to configure the engine within the configuration file:
+
+At the top of the file, add the following directive:
+
+```
+openssl_conf = openssl_init
+
+```
+
+At the end of the file, add the following section:
+
+
+```
+[openssl_init]
+engines = engine_section
+
+[engine_section]
+# Configure ENGINE named "dyadicsec"
+dyadicsec = dyadicsec_section
+
+[dyadicsec_section]
+# dyadicsec ENGINE specific commands
+engine_id = dyadicsec
+dynamic_path = /usr/lib/x86_64-linux-gnu/openssl-1.0.0/engines/libdyadicsec.so
+default_algorithms = RSA, ECDH, ECDSA
+set_gen_mode = 0
+init = 1
+
+```
+
+##### Updating Custom OpenSSL Configuration File
+For homegrown applications that do not use OpenSSL configuration file, use OpenSSL Dyadic Engine in Code
+
+Use the following code fragment to enable the Dyadic OpenSSL engine in code:
+
+```
+ENGINE_load_dynamic();
+ENGINE *e = ENGINE_by_id("dynamic");
+ENGINE_ctrl_cmd_string(e, "SO_PATH", "/path/to/ekm/ssl/engine/library", 0);
+ENGINE_ctrl_cmd_string(e, "ID", "dyadicsec", 0);
+ENGINE_ctrl_cmd_string(e, "LOAD", NULL, 0);
+ENGINE_init(e);
+ENGINE_set_default_RSA(e); 
+// for RSA, there are matching functions for EC based algorithms
+
+
+```
+Once you do that, all RSA operations executed in your software will be using the EKM engine. The location of the Dyadic OpenSSL engine is as follows:
+
+| OS       | Location and File         |
+| ------------- |:-------------:|
+| Windows     | /C:\Program Files\DyadicSec\SDK\openssl-engine\dyadicsec.dll |
+| Linux   | /usr/lib64/openssl/engines/libdyadicsec     |
+
+##### Using OpenSSL Console
+
+Alongside the library, OpenSSL comes with a console application. Use it to execute all supported operations in the command line module, including generating keys and certificates, encrypting and signing. 
+Once you use the option to configure OpenSSL globally as described above, use the EKM engine by adding the following command to the commands executed in the engine:
+engine dyadicsec 
+
+For more details on the OpenSSL console, please review the [OpenSSL Cryptography and SSL/TLS Toolkit](https://www.openssl.org/docs/apps/openssl.html).
+
+##### Generating Keys with OpenSSL
+
+Many applications in the Linux environment use OpenSSL. Applications such as web servers may create different short-lived keys. The EKM engine supports a configuration option that bypasses EKM when generating short-lived keys. 
+
+**Note**
+The setting is named set_gen_mode.  Its default value is  0 (generate keys outside of EKM). If you are looking to EKM keys with your application, set the value of this attribute to 1. You can do it by adding the setting to the openssl.cnf file or using the function  ENGINE_ctrl_cmd_string in code.
+
+##### General Comment on the EKM OpenSSL Engine
+
+The EKM OpenSSL engine is implemented in a way that only keys which are located in the EKM system are handled by EKM. For all other keys, the engine operates according to the default OpenSSL specification.
+
+#### Interworking with PKCS#11
+
+PKCS#11 refers to both:
+- a cryptographic interface standard for a platform-independent API 
+- **Cryptoki** API itself. (Cryptoki is short for “cryptographic token interface” and sounds like "crypto-key".) 
+
+The PKCS#11 API connects to cryptographic tokens, such as hardware security modules (HSM) and smart cards. It defines the most commonly used cryptographic object types (such as keys and certificates); and provides all the functions needed to use, create, generate, modify, and delete those objects. 
+
+The EKM Client supports the **PKCS#11 API, version 2.30**.
+
+Before starting to use PKCS#11 with EKM, familiarize yourself with the specification [here](https://www.oasis-open.org/committees/tc_home.php?wg_abbrev=pkcs11).
+
+##### Dyadic PKCS#11 Shared Library
+
+Usage of PKCS#11 begins by loading a dynamic shared library. 
+
+| OS       | File         | Directory         |
+| ------------- |:-------------:|
+| Linux     | libdsmpkcs11.so | /usr/lib(64)/         |
+| Windows   | dsmpkcs11.dll     | C:\Program Files\DyadicSec\bin\win64        |
+
+##### Supported Objects and Mechanisms
+The following table lists the different key types and mechanisms supported by the Dyadic PKCS#11 implementation. Items marked as Token are supported for EKM keys. Items that are not marked as Token are only supported for session keys.
+
+| Key Type      | Mechanism         | Token        |
+| ------------- |:-------------:|
+| Linux     | libdsmpkcs11.so | /usr/lib(64)/         |
+| Windows   | dsmpkcs11.dll     | C:\Program Files\DyadicSec\bin\win64        |
+
+
+**You can also use this section to include information about Architecture and Troubleshooting for known errors. If you include a Troubleshooting section, follow the Symptom/Explanation format used in the [Okta Troubleshooting](http://docs.pivotal.io/p-identity/okta/troubleshooting.html) topic**.  
