@@ -1,32 +1,39 @@
 ---
-title: Dyadic EKM Service Broker for PCF
+title: Using Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-##<a id='using'></a> Using Dyadic EKM Service Broker for PCF
+After the operator has installed and configured the tile, the Dyadic EKM Service Broker is ready for use.
+To use the Dyadic EKM Service Broker for key management, a developer creates the service instance and binds it to their app.
 
-### EKM at a Glance
+##<a id='bind'></a> Bind Your App to the Dyadic EKM Service Broker for PCF
 
-Dyadic Enterprise Key Management **(EKM)** provides a scalable key management platform for both virtualized and non-virtualized environments. Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and integration of the dedicated hardware elements (Hardware Security Modules). 
+1. Confirm that you have pushed your app using the Dyadic buildpack:
+   <pre class="terminal">$ cf push APP-NAME .... -b dyadic_buildpack</pre>
 
-Some notable features of the Dyadic EKM are: 
+1. Enable access to the service:
+   <pre class="terminal">$ cf enable-service-access dyadic-ekm</pre>
 
-1. It supports all standard RSA and ECC keys while remaining transparent to the application 
+1. Create EKM service instance:
+   <pre class="terminal">$ cf create-service dyadic-ekm default SERVICE-INSTANCE-NAME</pre>
 
-1. It transparently supports standard crypto-API’s: KMIP, PKCS#11, Microsoft CNG, OpenSSL. 
+1. Bind your app to service instance:
+   <pre class="terminal">$ cf bind-service APP-NAME SERVICE-INSTANCE-NAME</pre>
 
-1. It is platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace. 
+1. Verify the the app environments variable are correct:
+   <pre class="terminal">$ cf env APP-NAME</pre>
 
-1. Its installation does not disrupt the existing workflow of applications.
+1. If your app is running, restage it:
+   <pre class="terminal">$ cf restage APP-NAME</pre>
 
-1. It provides lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation.
+1. If you haven't run your app before, start it:
+   <pre class="terminal">$ cf start APP-NAME</pre>
 
-
-### Developing in Java using Dyadic Provider
+##<a id="code-sample"></a> Code Samples for Java Developers  
 
 Below are code samples of using the Dyadic EKM provider for different common use cases.
 
-##### RSA
+### RSA
 
 ```java
 byte[] testData = new byte[]{1, 2, 3, 4, 5};
@@ -65,7 +72,7 @@ ok = Arrays.equals(decrypted, testData);
 
 ```
 
-##### ECDSA
+### ECDSA
 
 The following code sample demonstrates ECDSA key generation and signature:
 
@@ -96,7 +103,7 @@ boolean ok = sign.verify(signature);
 
 ```
 
-##### AES
+### AES
 
 The following code sample demonstrates AES key generation and usage:
 

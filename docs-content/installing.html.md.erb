@@ -3,36 +3,36 @@ title: Installing and Configuring Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This topic describes how to install and configure Dyadic EKM Service Broker for PCF.
+This topic describes how to install and configure Dyadic EKM Service Broker for PCF and how to bind your app to the service broker.
 
 ##<a id='install'></a> Install and Configure Dyadic EKM Service Broker for PCF
 
-1. Download the product file from Pivotal Network.
+1. Download the product file from [Pivotal Network](https://network.pivotal.io/).
 
 1. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file. 
 
 1. Click **Add** next to the uploaded Dyadic EKM Service Broker for PCF tile in the Ops Manager **Available Products** view to add it to your staging area.
 
-1. Click the newly added *Dyadic EKM* tile.
+1. Click the newly added **Dyadic EKM** tile.
 
-1. Complete the following fields: <br>
-	1) The PFX certificate used for client authentication. <br>
-	2) The EKM root CA certificate used for server authentication. <br>
-	3) Comma separated list of EKM entry points addresses. <br>
+1. Complete the following fields:
+    * **Client Private Key**: The PFX certificate used for client authentication
+    * **Root CA certificate**: The EKM root CA certificate used for server authentication
+    * **EKM Servers**: Comma separated list of EKM entry point addresses
 
 	<img src="EKMTile.PNG" alt=" Dyadic EKM Service Broker config">
-	
+
+1. (Optional) Edit the **Message Send Timeout**, **Message Receive Timeout**, and **Message Retry Counter**. 
+In most cases, you can accept the default values.
+
 1. Click **Save**.
 
-1. Return to the Ops Manager Installation Dashboard and click **Apply Changes** to install Dyadic EKM tile.
+1. Return to the Ops Manager Installation Dashboard and click **Apply Changes** to install the Dyadic EKM tile.
 
-   <p class="note">
-		<strong>Note: </strong> 
-		Other properties : Message Send Timeout, Message Receive Timeout and Message Retry Counter
-		have default values and usually it's not necessary to modify them.  
-   </p>
+##<a id='bind'></a> Bind Your App to the Dyadic EKM Service Broker for PCF
 
-##<a id='bind'></a> Bind your application to the Dyadic EKM Service Broker for PCF
+1. Confirm that you have pushed your app using the Dyadic buildpack:
+   <pre class="terminal">$ cf push APP-NAME .... -b dyadic_buildpack</pre>
 
 1. Enable access to the service:
    <pre class="terminal">$ cf enable-service-access dyadic-ekm</pre> 
@@ -40,21 +40,14 @@ This topic describes how to install and configure Dyadic EKM Service Broker for 
 1. Create EKM service instance:
    <pre class="terminal">$ cf create-service dyadic-ekm default SERVICE-INSTANCE-NAME</pre>
 
-1. Bind your application to service instance:
+1. Bind your app to service instance:
    <pre class="terminal">$ cf bind-service APP-NAME SERVICE-INSTANCE-NAME</pre>
 
-1. Verify the the application environments variable are correct:
+1. Verify the the app environments variable are correct:
    <pre class="terminal">$ cf env APP-NAME</pre>
 
-1. Restage your application:
+1. If your app is running, restage it:
    <pre class="terminal">$ cf restage APP-NAME</pre>
    
-
-   <p class="note">
-		<strong>Note: </strong> 
-		Your Application must use Dyadic Buildpack
-		<code>cf push APP-NAME .... -b dyadic_buildpack</code> 
-		<br> If you haven't run your application before run
-		<code>cf start APP-NAME</code> 
-		Instead of <code>cf restage APP-NAME</code>
-   </p>
+1. If you haven't run your app before, start it:
+   <pre class="terminal">$ cf start APP-NAME</pre>

@@ -1,57 +1,65 @@
 ---
-title: Dyadic EKM Service Broker for PCF 1.2
+title: Dyadic EKM Service Broker for PCF v1.2
 owner: Partners
 ---
 
-
-
 This documentation describes the Dyadic Enterprise Key Management (EKM) Service Broker for Pivotal Cloud Foundry (PCF). 
-The EKM Service Broker registers a service broker on PCF and exposes its service plans on the Marketplace. 
-///AMY/// Developers can store and manage cryptographic keys in a pure-software solution that provides the same strong levels of security that they would find in a hardware solution. Keys remain as secure as if they were locked in hardware, because with the Dyadic EKM - key material is never exposed in clear text at any point during the key lifecycle, not even when it’s created or when it’s in use. Maintain full control of your keys anywhere: on-prem, on the cloud, any key, any cloud.
+The EKM Service Broker registers a service broker on PCF and exposes its service plans on the Marketplace.
 
 ## <a id='overview'></a>Overview
 
+Dyadic Enterprise Key Management (EKM) provides a scalable, key management platform for both virtualized and non-virtualized environments. 
+Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and 
+integration of the dedicated hardware elements.
+
+Using Dyadic EKM Service Broker for PCF, developers store and manage cryptographic keys with a software solution 
+that provides the same strong levels of security as a hardware solution (Hardware Security Modules).
+ 
+Keys remain as secure as if they were locked in hardware, because with the Dyadic EKM, key material is never exposed in clear text at any point during the key lifecycle, even when it’s created or in use. Maintain full control of your keys anywhere: on-prem, on the cloud, any key, and any cloud.
+
 Dyadic EKM Service Broker for PCF includes the following key features:
 
-* Hardware level security - without hardware.
-* Elastic and easily scalable.
-* Supports all cloud providers.
-* Supports all standard crypto algorithms and APIs
+* Hardware-level security without hardware
+* Elastic and easily scalable
+* Platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace
+* Supports all standard RSA and ECC keys while remaining transparent to the app
+* Transparently supports standard crypto-APIs: KMIP, PKCS#11, Microsoft CNG, OpenSSL
+* Installation does not disrupt the existing app workflow
+* Lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation
 
 ## <a id="snapshot"></a>Product Snapshot
 
 <dl>
 <dt>Dyadic EKM Service Broker for PCF details:</dt>
 <dd><strong>Version</strong>: v1.2 </dd>
-<dd><strong>Release date</strong>: February 1 2017</dd>
+<dd><strong>Release date</strong>: February 1, 2017</dd>
 <dd><strong>Software component version</strong>: v1.2.11756.1694</dd>
 <dd><strong>Compatible Ops Manager version(s)</strong>: v1.2.11756.1694</dd>
 <dd><strong>Compatible Elastic Runtime version(s)</strong>: v1.2.11756.1694</dd>
-<dd><strong>vSphere support?</strong> YES</dd>
-<dd><strong>OpenStack support?</strong> YES</dd>
-<dd><strong>AWS support?</strong> YES</dd>
+<dd><strong>vSphere support?</strong> Yes</dd>
+<dd><strong>OpenStack support?</strong> Yes</dd>
+<dd><strong>AWS support?</strong> Yes</dd>
 </dl>
 
 ## <a id="reqs"></a>Requirements
 
-
 Dyadic EKM Service Broker for PCF has the following requirements:
 
-+ OpenSSL
+* OpenSSL
 
-+ libapr version 1.3 or newer must be installed prior to installing the EKM Client To install libapr on Red Hat use the following command: sudo yum install apr
+* libapr v1.3 or newer must be installed prior to installing the EKM Client. To install libapr on Red Hat, use the following command:
+<pre class="terminal">$ sudo yum install apr</pre>
 
 ## <a id="limitations"></a>Limitations
 
-<dl>
-<dt>EKM Client runs on the following Operating Systems:</dt>
-<dd>Windows Version 7, 8.1, 10 (32) and (64)</dd>
-<dd>Windows Version 2008 R2 (64)</dd>
-<dd>Windows Version 2012 R2 (64)</dd>
-<dd>Linux RHEL 6.5 (32) and (64) and up</dd>
-<dd>Linux CentOS 6.5 (64) and up</dd>
-<dd>Ubuntu 12.04 (64) and up</dd>
-</dl>
+EKM Client runs on the following Operating Systems:
+
+* Windows v7, v8.1, v10 (32) and (64)
+* Windows 2008 R2 (64)
+* Windows 2012 R2 (64)
+* Linux RHEL v6.5 (32) and (64) and later
+* Linux CentOS v6.5 (64) and later
+* Ubuntu v12.04 (64) and later
 
 ## <a id="feedback"></a>Feedback
 
@@ -59,4 +67,4 @@ Please provide any bugs, feature requests, or questions to the [Pivotal Cloud Fo
 
 ## <a id='license'></a>License
 
-There are no license requirements on the client
+There are no license requirements on the client.
