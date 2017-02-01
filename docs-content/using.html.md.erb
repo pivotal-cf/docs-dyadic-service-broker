@@ -1,12 +1,133 @@
 ---
-title: Using YOUR-PRODUCT-NAME
+title: Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This topic describes how to use YOUR-PRODUCT-NAME.
+##<a id='using'></a> Using Dyadic EKM Service Broker for PCF
 
-##<a id='using'></a> Using YOUR-PRODUCT-NAME
+### EKM at a Glance
 
-**This topic should include any instructions for how to use the service or dashboard created by the tile. Give procedures for how to perform the different functions offered by your product, and provide screenshots where necessary.** 
+Dyadic Enterprise Key Management **(EKM)** provides a scalable key management platform for both virtualized and non-virtualized environments. Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and integration of the dedicated hardware elements (Hardware Security Modules). 
 
-**You can also use this section to include information about Architecture and Troubleshooting for known errors. If you include a Troubleshooting section, follow the Symptom/Explanation format used in the [Okta Troubleshooting](http://docs.pivotal.io/p-identity/okta/troubleshooting.html) topic**.
+Some notable features of the Dyadic EKM are: 
+
+1. It supports all standard RSA and ECC keys while remaining transparent to the application 
+
+1. It transparently supports standard crypto-API’s: KMIP, PKCS#11, Microsoft CNG, OpenSSL. 
+
+1. It is platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace. 
+
+1. Its installation does not disrupt the existing workflow of applications.
+
+1. It provides lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation.
+
+
+### Developing in Java using Dyadic Provider
+
+Below are code samples of using the Dyadic EKM provider for different common use cases.
+
+##### RSA
+
+```java
+byte[] testData = new byte[]{1, 2, 3, 4, 5};
+
+Security.addProvider(new DYCryptoProvider());
+KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
+keyStore.load(null);
+
+KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA", "DYADIC");
+gen.initialize(2048);
+KeyPair keyPair = gen.generateKeyPair();
+
+keyStore.setEntry("RSA test", new DYCryptoProvider.KeyEntry(keyPair.getPrivate()), null);
+PrivateKey prvKey = (PrivateKey) keyStore.getKey("RSA test", null);
+
+Signature sign = Signature.getInstance("SHA256WithRSA", "DYADIC");
+sign.initSign(prvKey);
+sign.update(testData);
+byte[] signature = sign.sign();
+
+sign = Signature.getInstance("SHA256WithRSA");
+RSAPrivateCrtKey rsa = (RSAPrivateCrtKey) prvKey;
+KeyFactory kf = KeyFactory.getInstance("RSA");
+PublicKey pubKey = kf.generatePublic(new RSAPublicKeySpec(rsa.getModulus(), rsa.getPublicExponent()));
+sign.initVerify(pubKey);
+sign.update(testData);
+boolean ok = sign.verify(signature);
+
+Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING");
+cipher.init(Cipher.ENCRYPT_MODE, pubKey);
+byte[] encrypted = cipher.doFinal(testData);
+cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING", "DYADIC");
+cipher.init(Cipher.DECRYPT_MODE, prvKey);
+byte[] decrypted = cipher.doFinal(encrypted);
+ok = Arrays.equals(decrypted, testData);
+
+```
+
+##### ECDSA
+
+The following code sample demonstrates ECDSA key generation and signature:
+
+```java
+Security.addProvider(new DYCryptoProvider());
+KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
+keyStore.load(null);
+
+KeyPairGenerator gen = KeyPairGenerator.getInstance("EC", "DYADIC");
+gen.initialize(new ECGenParameterSpec("secp256r1"));
+KeyPair keyPair = gen.generateKeyPair();
+
+keyStore.setEntry("ECDSA test",
+		new DYCryptoProvider.KeyEntry(keyPair.getPrivate()), null);
+PrivateKey prvKey = (PrivateKey) keyStore.getKey("ECDSA test", null);
+
+byte[] testData = new byte[] { 1, 2, 3, 4, 5 };
+
+Signature sign = Signature.getInstance("SHA256WithECDSA", "DYADIC");
+sign.initSign(prvKey);
+sign.update(testData);
+byte[] signature = sign.sign();
+
+sign = Signature.getInstance("SHA256WithECDSA");
+sign.initVerify(keyPair.getPublic());
+sign.update(testData);
+boolean ok = sign.verify(signature);
+
+```
+
+##### AES
+
+The following code sample demonstrates AES key generation and usage:
+
+```java
+Security.addProvider(new DYCryptoProvider());
+KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
+keyStore.load(null);
+
+KeyGenerator gen = KeyGenerator.getInstance("AES", "DYADIC");
+gen.init(256);
+SecretKey secretKey = (SecretKey) gen.generateKey();
+keyStore.setKeyEntry("AES test", secretKey, null, null);
+
+SecureRandom secureRandom = new SecureRandom();
+byte[] data = new byte[64];
+byte[] iv = new byte[12];
+byte[] AD = new byte[12];
+secureRandom.nextBytes(data);
+secureRandom.nextBytes(data);
+secureRandom.nextBytes(iv);
+secureRandom.nextBytes(AD);
+CcmParameterSpec ccmParameterSpec = new CcmParameterSpec(iv, 12, AD);
+Cipher encryptCipherEncrypt = Cipher.getInstance("AES/CCM/NoPadding");
+encryptCipherEncrypt.init(Cipher.ENCRYPT_MODE, secretKey, ccmParameterSpec);
+encryptCipherEncrypt.update(data, 0, data.length / 2);
+encryptCipherEncrypt.update(data, data.length / 2, data.length / 2);
+byte[] enc = encryptCipherEncrypt.doFinal();
+Cipher encryptCipherDecrypt = Cipher.getInstance("AES/CCM/NoPadding");
+encryptCipherDecrypt.init(Cipher.DECRYPT_MODE, secretKey, ccmParameterSpec);
+byte[] dec = encryptCipherDecrypt.doFinal(enc);
+
+
+```
+
