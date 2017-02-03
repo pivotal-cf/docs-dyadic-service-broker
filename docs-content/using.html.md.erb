@@ -31,9 +31,23 @@ To use the Dyadic EKM Service Broker for key management, a developer creates the
 
 ##<a id="code-sample"></a> Code Samples for Java Developers  
 
-Below are code samples of using the Dyadic EKM provider for different common use cases.
+You will now be able to perform different crypto operations within the Dyadic EKM system. 
+Below are code samples of using the Dyadic EKM Java provider for different common use cases.
+
+The class ```java com.dyadicsec.provider.DYCryptoProvider ``` implements the provider. Use either the ```java java.security file ``` (see the [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) for details) or create a new ```java DYCryptoProvider``` object in code to add the Dyadic provider to your application. Then enable its use using the following: 
+```java 
+Security.addProvider(new DYCryptoProvider());
+
+```
+
+After the new provider is added to the list of providers, use the Dyadic provider name “DYADIC” to create instances of <mark>KeyStore</mark>, <mark>KeyGenerator</mark> and <mark>Cipher</mark> classes, which will use the underlying EKM functionality to persist keys and run crypto operations. The DYADIC <mark>KeyStore</mark> type is <mark>“PKCS11”</mark>.
+
+Follow the standard [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) to use <mark>KeyStore</mark>, <mark>KeyGenerator</mark> and <mark>Cipher</mark> for generating keys.
+
 
 ### RSA
+
+The following code sample demonstrates RSA for signing and encryption:
 
 ```java
 byte[] testData = new byte[]{1, 2, 3, 4, 5};
