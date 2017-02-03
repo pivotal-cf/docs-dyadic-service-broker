@@ -34,15 +34,15 @@ To use the Dyadic EKM Service Broker for key management, a developer creates the
 You will now be able to perform different crypto operations within the Dyadic EKM system. 
 Below are code samples of using the Dyadic EKM Java provider for different common use cases.
 
-The class ```java com.dyadicsec.provider.DYCryptoProvider ``` implements the provider. Use either the ```java java.security file ``` (see the [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) for details) or create a new ```java DYCryptoProvider``` object in code to add the Dyadic provider to your application. Then enable its use using the following: 
-```java 
-Security.addProvider(new DYCryptoProvider());
+The class `com.dyadicsec.provider.DYCryptoProvider` implements the provider. Use either the `java.security` file (see the [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) for details) or create a new `DYCryptoProvider` object in code to add the Dyadic provider to your application. Enable the Dyadic provider using the following:
 
+```java
+Security.addProvider(new DYCryptoProvider());
 ```
 
-After the new provider is added to the list of providers, use the Dyadic provider name “DYADIC” to create instances of <mark>KeyStore</mark>, <mark>KeyGenerator</mark> and <mark>Cipher</mark> classes, which will use the underlying EKM functionality to persist keys and run crypto operations. The DYADIC <mark>KeyStore</mark> type is <mark>“PKCS11”</mark>.
+After the new provider is added to the list of providers, use the Dyadic provider name `"DYADIC"` to create instances of `KeyStore`, `KeyGenerator`, and `Cipher` classes, which will use the underlying EKM functionality to persist keys and run crypto operations. The Dyadic `KeyStore` type is `"PKCS11"`.
 
-Follow the standard [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) to use <mark>KeyStore</mark>, <mark>KeyGenerator</mark> and <mark>Cipher</mark> for generating keys.
+Follow the standard [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) to use `KeyStore`, `KeyGenerator`, and `Cipher` for generating keys.
 
 
 ### RSA
