@@ -3,29 +3,28 @@ title: Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This documentation describes the Dyadic Enterprise Key Management (EKM) Service Broker for Pivotal Cloud Foundry (PCF). 
+This documentation describes the Dyadic Enterprise Key Management (EKM) Service Broker for Pivotal Cloud Foundry (PCF).
 The EKM Service Broker registers a service broker on PCF and exposes its service plans on the Marketplace.
 
 ## <a id='overview'></a>Overview
 
-Dyadic Enterprise Key Management (EKM) provides a scalable, key management platform for both virtualized and non-virtualized environments. 
-Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and 
+Dyadic Enterprise Key Management (EKM) provides a scalable, key management platform for both virtualized and non-virtualized environments.
+Dyadic EKM is a software solution that delivers security guarantees comparable to ones that require deployment and
 integration of the dedicated hardware elements.
 
-Using Dyadic EKM Service Broker for PCF, developers store and manage cryptographic keys with a software solution 
+Using Dyadic EKM Service Broker for PCF, developers store and manage cryptographic keys with a software solution
 that provides the same strong levels of security as a hardware solution (Hardware Security Modules).
- 
-Keys remain as secure as if they were locked in hardware, because with the Dyadic EKM, key material is never exposed in clear text at any point during the key lifecycle, even when it’s created or in use. Maintain full control of your keys anywhere: on-prem, on the cloud, any key, and any cloud.
+
+Keys remain as secure as if they were locked in hardware because, with the Dyadic EKM, key material is never exposed in clear text at any point during the key lifecycle, even when it is created or in use. Maintain full control of your keys anywhere: on-prem, on the cloud, any key, and any cloud.
 
 Dyadic EKM Service Broker for PCF includes the following key features:
 
-* Hardware-level security without hardware
-* Elastic and easily scalable
-* Platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and Rackspace
-* Supports all standard RSA, AES, and ECC keys while remaining transparent to the app
-* Transparently supports standard crypto-APIs: KMIP, PKCS#11, Microsoft CNG, OpenSSL
-* Installation does not disrupt the existing app workflow
-* Lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation
+*   Hardware-grade security without hardware
+*   Elastic and scalable
+*   Platform agnostic and supports cloud vendors, including but not limited to AWS, Azure, and GCP
+*   Supports all standard RSA, AES and ECC keys while remaining transparent to the app
+*   Transparently supports standard crypto-frameworks: Java JCE, KMIP, PKCS#11, and Microsoft CNG
+*   Lifecycle management of crypto-keys including partitioning, BYOK (Bring Your Own Key), generation, renewal, archiving, and revocation
 
 ## <a id="snapshot"></a>Product Snapshot
 
@@ -41,30 +40,16 @@ Dyadic EKM Service Broker for PCF includes the following key features:
 <dd><strong>AWS support?</strong> Yes</dd>
 </dl>
 
-## <a id="reqs"></a>Requirements
+## <a id='license'></a>License
 
-Dyadic EKM Service Broker for PCF has the following requirements:
+There are no license requirements for the EKM Service Broker.
 
-* OpenSSL
+##<a id='next step'></a> The Next Step
 
-* libapr v1.3 or newer must be installed prior to installing the EKM Client. To install libapr on Red Hat, use the following command:
-<pre class="terminal">$ sudo yum install apr</pre>
+Request an Evaluation Package by completing [this form](https://info.dyadicsec.com/pivotal_eval_request/) on the Dyadic website.
 
-## <a id="limitations"></a>Limitations
 
-EKM Client runs on the following Operating Systems:
-
-* Windows v7, v8.1, v10 (32) and (64)
-* Windows 2008 R2 (64)
-* Windows 2012 R2 (64)
-* Linux RHEL v6.5 (32) and (64) and later
-* Linux CentOS v6.5 (64) and later
-* Ubuntu v12.04 (64) and later
 
 ## <a id="feedback"></a>Feedback
 
-Please provide any bugs, feature requests, or questions to the [Pivotal Cloud Foundry Feedback](mailto:pivotal-cf-feedback@pivotal.io) list or send an email to support@dyadicsec.com. 
-
-## <a id='license'></a>License
-
-There are no license requirements on the client.
+Please provide any bugs, feature requests, or questions to the [Pivotal Cloud Foundry Feedback](mailto:pivotal-cf-feedback@pivotal.io) or send an email to support@dyadicsec.com.

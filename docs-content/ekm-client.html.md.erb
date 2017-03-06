@@ -1,0 +1,344 @@
+---
+title: Using the EKM Client During the Development
+owner: Partners
+---
+
+This topic addresses software developers that want to perform full integration with the Dyadic solution in their development environment.
+It walks you through the steps to establish in-house setup that mimics integration with the Dyadic "Tile" in the Pivotal Cloud Foundry (**PCF**).
+In addition, it provides you with a set of CLI commands for debugging and troubleshooting.
+
+However, if you are mainly interested in the samples of application code, skip this topic and continue to the <a href="/dyadic-service-broker/using.html">Code Samples</a>
+
+<p class="note">
+If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: https://info.dyadicsec.com/pivotal_eval_request
+</p>
+
+## <a id='Introduction'></a> Introduction
+
+To utilize Dyadic Solution provided by PCF, your application must use Java ```JCE framework``` as the interface to the crypto operations.
+Dyadic plugs into the JCE framework by means of the ```EKM Client```.
+The client cooperates with the cluster of ```EKM Servers``` that are already deployed . Collaboration between the Client and Servers implements the required crypto-action using Multi-Party Computation (MPC).
+
+As the developer, you will make standard installation of one software module (**EKM Client**),
+follow Java instructions to add custom Security Provider to Java Framework,  and you are all set to go.
+
+<img src="EKMide.PNG" alt=" Dyadic EKM IDE">
+
+**Note**: EKM Servers are already deployed in the cloud waiting for the engagement with your application via the EKM Client.
+
+
+##### Abbreviations
+
+| Abbreviation | Meaning                        | Description                                          |
+|--------------|--------------------------------|------------------------------------------------------|
+| DSM          | Distributed Security Module    | Previous acronym of the Dyadic Solution              |
+| EKM          | Enterprise Key Management      | Production Name of the Dyadic Solution               |
+| FQDN         | Fully Qualified Domain Name    | It is a domain name that specifies its exact location in the DNS  |
+| JCE          | Java Cryptography Extension    | Java framework for implementation of crypto primitives    |
+| MPC          | Multi-Party Computation        | Crypto Technology used by Dyadic                     |
+
+
+### <a id='Prerequisites'></a> Prerequisites
+
+Your development station must run one of the following OSs:
+
+| Operating System | Version                                                                         |
+|------------------|---------------------------------------------------------------------------------|
+| Windows          | 7, 8.1, 10 (32) and (64)<br> 2008 R2 (64)<br> 2012 R2 (64)                            |
+| Linux            | RHEL 6.5 (32) and (64) and up<br> CentOS 6.5 (64) and up<br> Ubuntu 12.04 (64) and up |
+
+
+##### Requirements
+
+1.  Your Application must use ```JCE Framework``` for the realization of crypto operations
+
+1.  If your development station is Linux - ```libapr``` version 1.3 or newer must be installed
+
+    To install it on Red Hat use  <pre class="terminal">sudo yum install apr</pre>
+
+1.  Your Firewall should allow connection to EKM Server over ```TCP Port 61615```
+
+
+## <a id='Preparation'></a> Installing and Starting EKM Client on your Development Station
+
+### <a id='Unboxing'></a> Unboxing the Package
+
+The Package you obtained from Dyadic includes Software and Data files.
+
+The Software section contains OS-specific EKM Client SW:
+
+| OS           | Name of File                            |
+|--------------|-----------------------------------------|
+| RHEL         | `dsm-client-{version}-RHES.x86_64.rpm`  |
+| UBUNTU       | `dsm_client.{version}.DEBIAN_amd64.deb` |
+| Windows      | `dsm_client_{version}_Windows.x64.msi`  |
+
+The Data section contains the Address of the EKM Server and Certificate files required to establish SSL connection with it (via TCP port 61615)
+
+| Item                       | Description                                  |
+|----------------------------|----------------------------------------------|
+| `EKM Server Address`       | Address of the EKM Server in the **FQDN** format.<br>For example: ekmuse.dyadicsec.com  |
+| `key.pem`                  | SSL Authentication Certificate. It contains the Private Key  |
+| `ca.crt`                   | Root Certificate of EKM                      |
+
+### <a id='Installation'></a> Installing the EKM Client
+
+Use the following table to install  EKM Client SW (called "dsm client") that matches the OS of your development station:
+
+| OS           | Command                                                                                   |
+|--------------|-------------------------------------------------------------------------------------------|
+| RHEL         | <pre class="terminal">sudo yum localinstall dsm-client-{version}-RHES.x86_64.rpm </pre>   |
+| UBUNTU       | <pre class="terminal">sudo dpkg -i dsm\_client.{version}.DEBIAN\_amd64.deb </pre>           |
+| Windows      | <pre class="terminal">dsm\_client\_{version}\_Windows.x64.msi </pre>                         |
+
+</p>
+
+1. Plug Dyadic **dsm-advapi jar** file into JCE by copying or soft-linking it into ```<Java Directory>/jre/lib/ext```. For example:
+
+    | OS           | Command                                                                                                                         |
+    |--------------|---------------------------------------------------------------------------------------------------------------------------------|
+    | RHEL         | <pre class="terminal">sudo ln -s /usr/lib64/dsm/dsm-advapi-1.0.jar    /usr/lib/jvm/java-8-openjdk-amd64/jre/lib64/ext/</pre>    |
+    | UBUNTU       | <pre class="terminal">sudo ln -s /usr/lib/dsm/dsm-advapi-1.0.jar    /usr/lib/jvm/java-8-openjdk-amd64/jre/lib/ext/</pre>        |
+    | Windows      | <pre class="terminal">cp C:\dsm\dsm-advapi-1.0.jar    C:\Program Files (x86)\Java\jre1.8.0_111\lib\ext </pre>                   |
+
+1. Edit the `java.security` file, and insert the reference to Dyadic as one of the crypto providers (**DYCryptoProvider**):
+
+    | OS           | An Example of Folder containing the `java.security` file     |
+    |--------------|--------------------------------------------------------------|
+    | RHEL         |  `/usr/lib/jvm/java-8-openjdk-amd64/jre/lib64/security`      |
+    | UBUNTU       |  `/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/security`        |
+    | Windows      |  `C:\Program Files (x86)\Java\jre1.8.0_111\lib\security`     |
+
+</p>
+    We recommend to insert Dyadic (**security.provider.5=com.dyadicsec.provider.DYCryptoProvider**) before the reference to the **SunJCE** as shown below
+
+```
+    security.provider.1=sun.security.provider.Sun
+    security.provider.2=sun.security.rsa.SunRsaSign
+    security.provider.3=sun.security.ec.SunEC
+    security.provider.4=com.sun.net.ssl.internal.ssl.Provider
+    security.provider.5=com.dyadicsec.provider.DYCryptoProvider  // insert DYADIC here
+    security.provider.6=com.sun.crypto.provider.SunJCE
+    security.provider.7=sun.security.jgss.SunProvider
+    security.provider.8=com.sun.security.sasl.Provider
+    security.provider.9=org.jcp.xml.dsig.internal.dom.XMLDSigRI
+    security.provider.10=sun.security.smartcardio.SunPCSC
+```
+<p class="note"><strong>Note</strong>
+You must renumerate all entries in the list starting with the newly inserted Provider.
+</p>
+
+### <a id='Configuration'></a> Configuring the EKM Client
+
+The configuration of the EKM Client is straightforward. It requires you to specify the Network Name of the EKM Server (`EKM Server Address`) as received with the package.
+
+| OS      | Folder                    |
+|---------|---------------------------|
+| Linux   | Open `client.conf` file in the `/etc/dsm` folder                 |
+| Windows | Navigate to the registry key: `HKEY\_LOCAL\_MACHINE/SOFTWARE/DyadicSec/SDK` |
+
+Set `servers=<EKM Server Address>`. For example:
+
+```
+servers = ekmuse.dyadicsec.com
+```
+
+
+### <a id='Starting'></a> Activating EKM Client-Server Connection
+
+To Activate connection between EKM Client and its Server, place the received Access Credentials ( `key.pem` and `ca.crt` ) files in the following folder:
+
+| OS      | Folder                       |
+|---------|------------------------------|
+| Linux   | `/etc/dsm`                   |
+| Windows | `C:\ProgramData\dyadic\dsm`  |
+
+<p class="note"><strong>Note</strong>
+By default, the <strong>ProgramData</strong> directory in Windows is  hidden. Create the <strong>dyadic</strong> and <strong>dsm</strong> folders, as needed.
+</p>
+
+To verify the connection, run ```dsmcl list``` command.
+
+<pre class="terminal">
+$ dsmcl list
+
+Partition 0: test
+Private RSA key  : UID=b9d3a8dddd7e379a
+Private RSA key  : UID=e81a67a6d10348ac
+$
+</pre>
+
+### <a id='Troubleshooting'></a>Troubleshooting the Installation
+
+
+| Problem                                     | What happened                                                           | What to do about it                                                                                                                                              |
+|---------------------------------------------|-------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Unable to install EKM                       | You may be using an unsupported OS or (on Linux) "apr" is missing       | Make sure: <br> 1.you are using one of the supported OSs. <br> 2. (on Linux) **apr** is missing                                                                                                                                       |
+| Unable to activate Client-Server connection | The address of the Server is mistaken or the connection is blocked      | Verify the following: <br>1. `/etc/dsm/client.conf` or appropriate Windows Register specifies the correct EKM Server. <br>2. Connection to the Server over `TCP port 61615` is not blocked |
+
+
+## <a id='CLI-Client'></a>Appendix A: CLI For EKM Observer
+
+This sub-topic provides additional information to assist you while testing and debugging your application.
+
+Installation of the EKM Client added `dsmcl` CLI program on your development station. Use it to examine and manipulate EKM crypto objects created on your behalf by EKM Client and Servers. The overall syntax is:
+
+<pre class="terminal">dsmcl [command] [options]</pre>
+
+
+### <a id='dsmcllist'></a>dsmcl list
+
+
+Use the list command to view crypto objects (e.g., keys, certificates) and their attributes such as Unique ID (UID), name, description.
+
+-   **UID** is used as the parameter in the Object-specific CLIs
+-   **name** is used in Dyadic APIs.
+-   **description** is a free text.
+
+Syntax: `dsmcl list [-t <object type>]`
+
+| Option      | Description                                                             |
+|-------------|-------------------------------------------------------------------------|
+| `-t <type>` | Filters the list of objects by the type: <br> RSA, ECC, CERT, DATA, PWD, AENC, PRF, AES |
+
+<pre class="terminal">
+dsmcl list
+dsmcl list -t RSA
+dsmcl list -t CERT
+</pre>
+
+### <a id='dsmclshow'></a> dsmcl show
+
+Use the show command to see the contents of the selected object(s). You can specify the UID of the object or the type. The latter options presents all objects of the specified type
+
+Syntax: `dsmcl show [(-u <uid> | -t <type>)]`
+
+| Option      | Description                                                  |
+|-------------|--------------------------------------------------------------|
+| `-u <UID>`  | The UID of a crypto-object. Obtain it using the list command |
+| `-t <type>` | The type of the objects to be shown                          |
+
+<pre class="terminal">
+dsmcl show -u e9b653de39be17bd
+dsmcl show -t RSA
+</pre>
+
+### <a id='change-info'></a> dsmcl change-info
+
+Use this command to set or modify the name or description of the object.
+
+Syntax: `dsmcl change-info -u <UID> ([-n <name>] | [-d <description>]) `
+
+| Option             | Description                                                  |
+|--------------------|--------------------------------------------------------------|
+| `-u <UID>`         | The Unique Identification Number of an object, such as a key <br> A mandatory parameter |
+| `-n <name>`        | The new name of the object                                   |
+| `-d <description>` | The new description of the object                            |
+
+<pre class="terminal">dsmcl change-info -u 055e36fe83358cd4 -n apache -d "description with spaces"</pre>
+
+## <a id='CLI-CRUD'></a>Appendix B: Creating/Deleting and Exporting/Importing EKM Objects
+
+This set of CLI commands  takes you one level deeper into EKM. It allows you manually create and manipulate EKM Objects, and import or export keys and certificates.
+
+### <a id='dsmclgenerate'></a>dsmcl generate
+
+Use to generate a new key of the required type and the proper attributes
+
+Syntax: `dsmcl generate -t <type> -s <size> [-n <name> -d <description>] -c <curve> -m (S|E|D) `
+
+
+| Option | Used with      | Description                                                                                                      |
+|--------|----------------|------------------------------------------------------------------------------------------------------------------|
+| \-t    |                | Type of the key: - mandatory parameter. One of the following: <br> RSA, ECC, CERT, DATA, PWD, AENC, PRF, AES                   |
+| \-s    | -t RSA -t AES | Key size, when the key is RSA or AES: 128,256,2048,3072,4096                                                     |
+| \-n    |                | Name of the new key                                                                                              |
+| \-d    |                | Description of the new key                                                                                       |
+| \-c    | -t ECC        | EC curve to use, when the key is EC key: P256,P384,P521                                                          |
+| \-m    | -t ECC        | Used with ECC. Mandatory parameter. Specifies the purpose of the Key: <br> S for Sign, E for dEcrypt, or D for Derive |
+
+<pre class="terminal">
+dsmcl generate -t (RSA | AES) -s (128 | 256 | 2048 | 3072 | 4096)
+dsmcl generate -t ECC -c (P256 | P384 | P521) -m (S,E,D)
+</pre>
+
+### <a id='dsmcldelete'></a>dsmcl delete
+
+Syntax: `dsmcl delete -u <UID>`
+
+| Option    | Description                                                                          |
+|-----------|--------------------------------------------------------------------------------------|
+| -u <UID>  | The UID of the object to be deleted |
+
+<pre class="terminal">
+dsmcl delete -u 0x6AA15948
+</pre>
+
+<p class="note"><strong>Note</strong>
+Deleting of an object is final - it cannot be recovered. In particular, data that was encrypted with the deleted key cannot be decrypted.
+</p>
+
+### <a id='dsmclexport'></a>dsmcl export
+
+This command supports integration with other systems by providing a public key which can be used to encrypt data or verify a signature. You can export the following objects:
+
+-   Certificate - File in CER format
+
+-   Public Key – File in PEM format
+
+Syntax: `dsmcl export -u <UID> -o <output-file-name> [-x]`
+
+| Option    | Description                                                                                                                                                                 |
+|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| \-u (UID) | The UID of the selected object                                                                                        |
+| \-o       | File to store the data                                                                                                                                   |
+| \-x       |This option obfuscates the data. <br> It is done just for the sake of compatibility with the OpenSSL |
+
+<pre class="terminal">
+dsmcl export -u 629d6e5c500c6b04 -o c:\test\key1.pem
+</pre>
+
+### <a id='dsmclexport'></a> dsmcl import
+
+You can import an RSA or ECC key/certificate into EKM Client.
+The supported file formats are PEM, CER, and PKCS\#12 file formats.
+
+Syntax: `dsmcl import -i <filename> [-p <password>] [-f <format>] [-n <name>] [-d <description>] -k -ca -m S [-x]`
+
+
+| Option            | Description                                                                                         |
+|-------------------|-----------------------------------------------------------------------------------------------------|
+| \-i (file)        | The input file                                                                                      |
+| \-p (password)    | The PFX/P12 password                                                                                |
+| \-f               | The format of the import file: PEM,CER,P12                                                          |
+| \-n (name )       | The name of the imported key                                                                        |
+| \-d (description) | The description of the new key                                                                      |
+| \-k               | Don’t import the certificate, if such exists, import only the private key                           |
+| \-ca              | If the file contains a key certificates chain, import all certificates in the chain to EKM as well. |
+| \-l               | add a label to the key you are importing                                                            |
+| \-m (S,E,D)       | for ECC file formats, specify the purpose: S for Sign, E for dEcrypt, and D for Derive              |
+| \-x               | Override the original file, replace private key material with obfuscated data                       |
+
+<pre class="terminal">
+dsmcl import -i 2048.pfx -p 123456
+</pre>
+
+## <a id='Config'></a>Appendix C: Configurable Attributes of the EKM Client
+
+This sub-topic provides additional information to assist you while testing and debugging your application.
+
+We already met the requirement to specify the EKM Server that serves the Client.
+The rest of the attributes are defaults, and, by convention, the absence of the specific name-value pair implies that the default value is being used.
+Though it is highly unlikely that you will have to change the default values, the following is provided for your information, just in case:
+
+-   On Linux: edit the `client.conf` file
+
+-   on Windows by adding registry keys to `HKEY\_LOCAL\_MACHINE/SOFTWARE/DyadicSec/SDK`.
+
+| Setting           | Description                                                                                                                                                                                                                                                                                                | Default    |
+|-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| `servers`         | String. The list of EKM EPs serving the client                                                                                                                                                                                                                                                             | N/A        |
+| `ha_mode_standby` | Boolean. If set to true, the client will always connect to the first server in the list and will fall back to the next server in the list only if the first server fails and so on. When set to false, the client will arbitrarily pick a server to connect to and move to a different server on failures. | false      |
+| `send_timeout`    | Milliseconds. The timeout to wait on sending a request to the current EKM EP. If the timeout expires and all retries are consumed, the client will try to connect to a different server according to ha\_mode\_standby specification.                                                                      | 10 seconds |
+| `recv_timeout`    | Milliseconds. The timeout to wait for a response from the EKM EP server after the message was sent. If the timeout expires and all retries are consumed, the client will try to connect to a different server according to ha\_mode\_standby specification.                                                | 20 seconds |
+| `retries`         | Integer. Indicates the total number of attempts the client makes to contact with the EKM Server                                                                                                                                                                                                            | 2          |

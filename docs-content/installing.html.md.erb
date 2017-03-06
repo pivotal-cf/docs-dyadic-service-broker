@@ -3,29 +3,30 @@ title: Installing and Configuring Dyadic EKM Service Broker for PCF
 owner: Partners
 ---
 
-This topic describes how to install and configure Dyadic EKM Service Broker for PCF and how to bind your app to the service broker.
-##<a id='license'></a> Request Evaluation License Package for Dyadic EKM Service Broker for PCF
+This topic describes how to activate Dyadic EKM Service Broker to serve your application in PCF Environment
 
-Request an Evaluation License Package by completing [this form](http://info.dyadicsec.com/pivotal_eval_request/) on the Dyadic website.
+<p class="note">
+If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: https://info.dyadicsec.com/pivotal_eval_request
+</p>
 
 ##<a id='install'></a> Install and Configure Dyadic EKM Service Broker for PCF
 
-1. Download the product file from [Pivotal Network](https://network.pivotal.io/products/dyadic-ekm-service-broker).
+1. Download the product file ("tile") from [Pivotal Network](https://network.pivotal.io/products/dyadic-ekm-service-broker).
 
-1. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file. 
+1. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file.
 
 1. Click **Add** next to the uploaded Dyadic EKM Service Broker for PCF tile in the Ops Manager **Available Products** view to add it to your staging area.
 
 1. Click the newly added **Dyadic EKM** tile.
 
-1. Complete the following fields using the information you received in the Evaluation License Package:
-    * **Client Private Key**: The PFX certificate used for client authentication
-    * **Root CA certificate**: The EKM root CA certificate used for server authentication
-    * **EKM Servers**: Comma separated list of EKM entry point addresses
+1.  Complete the following fields using the information you received in the Evaluation License Package:
+    *   **Client Private Key**: The PFX certificate used for client authentication
+    *   **Root CA certificate**: The EKM root CA certificate used for server authentication
+    *   **EKM Servers**: Comma separated list of EKM Server addresses
 
 	<img src="EKMTile.PNG" alt=" Dyadic EKM Service Broker config">
 
-1. (Optional) Edit the **Message Send Timeout**, **Message Receive Timeout**, and **Message Retry Counter**. 
+1.  (Optional) Edit the **Message Send Timeout**, **Message Receive Timeout** (in milliseconds), and **Message Retry Counter**.
 In most cases, you can accept the default values.
 
 1. Click **Save**.
@@ -34,23 +35,41 @@ In most cases, you can accept the default values.
 
 ##<a id='bind'></a> Bind Your App to the Dyadic EKM Service Broker for PCF
 
-1. Confirm that you have pushed your app using the Dyadic buildpack:
-   <pre class="terminal">$ cf push APP-NAME .... -b dyadic_buildpack</pre>
+To use the Dyadic EKM Service Broker for crypto operations, follow these steps:
+
+1.  Confirm that you have pushed your app using the Java Buildpack for CF:
+    <pre class="terminal">$ cf push APP-NAME .... -b java_buildpack</pre>
 
 1. Enable access to the service:
-   <pre class="terminal">$ cf enable-service-access dyadic-ekm</pre> 
+   <pre class="terminal">$ cf enable-service-access dyadic-ekm</pre>
 
 1. Create EKM service instance:
    <pre class="terminal">$ cf create-service dyadic-ekm default SERVICE-INSTANCE-NAME</pre>
 
-1. Bind your app to service instance:
-   <pre class="terminal">$ cf bind-service APP-NAME SERVICE-INSTANCE-NAME</pre>
+1.  Bind your app to a service instance:
+    <pre class="terminal">$ cf bind-service APP-NAME SERVICE-INSTANCE-NAME</pre>
 
-1. Verify the the app environments variable are correct:
-   <pre class="terminal">$ cf env APP-NAME</pre>
+1.  Verify that the environments variables that are used by the Broker are correct:
+    <pre class="terminal">$ cf env APP-NAME</pre>
 
+    In particular, examine the _"credentials"_ and assert that its attributes and values match the one provided in the configuration step:
+<pre class="terminal">
+System-Provided:
+{
+ "VCAP_SERVICES": {
+  "dyadic-ekm": [
+   {
+    "credentials": {
+        "ca": "-----BEGIN CERTIFICATE----- xxxx
+        "key": "Bag Attributes  xxxx  -----BEGIN CERTIFICATE----- xxxx
+                Bag Attributes  xxxx  -----BEGIN ENCRYPTED PRIVATE KEY----- xxxx
+        "recv_timeout": "20000",
+        "retries": "2",
+        "send_timeout": "10000",
+        "servers": "52.174.3.129"
+</pre>
 1. If your app is running, restage it:
    <pre class="terminal">$ cf restage APP-NAME</pre>
-   
+
 1. If you haven't run your app before, start it:
    <pre class="terminal">$ cf start APP-NAME</pre>
