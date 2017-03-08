@@ -1,58 +1,43 @@
 ---
-title: Using Dyadic EKM Service Broker for PCF
+title: Code Samples
 owner: Partners
 ---
 
-After the operator has installed and configured the tile, the Dyadic EKM Service Broker is ready for use.
-To use the Dyadic EKM Service Broker for key management, a developer creates the service instance and binds it to their app.
+This topic demonstrates the use of **DYADIC** as the **JCE**-Provider in various crypto-cases.
 
-##<a id='bind'></a> Bind Your App to the Dyadic EKM Service Broker for PCF
 
-1. Confirm that you have pushed your app using the Dyadic buildpack:
-   <pre class="terminal">$ cf push APP-NAME .... -b dyadic_buildpack</pre>
+## <a id='bind'></a> Introduction
 
-1. Enable access to the service:
-   <pre class="terminal">$ cf enable-service-access dyadic-ekm</pre>
+To start using Dyadic-based realization of crypto-primitives, specify **"DYADIC"** as your default JCE provider.
+Consult [JCE](<https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html>) Documentation for the use of **KeyStore**, **KeyGenerator**, and **Cipher**.
 
-1. Create EKM service instance:
-   <pre class="terminal">$ cf create-service dyadic-ekm default SERVICE-INSTANCE-NAME</pre>
-
-1. Bind your app to service instance:
-   <pre class="terminal">$ cf bind-service APP-NAME SERVICE-INSTANCE-NAME</pre>
-
-1. Verify the the app environments variable are correct:
-   <pre class="terminal">$ cf env APP-NAME</pre>
-
-1. If your app is running, restage it:
-   <pre class="terminal">$ cf restage APP-NAME</pre>
-
-1. If you haven't run your app before, start it:
-   <pre class="terminal">$ cf start APP-NAME</pre>
-
-##<a id="code-sample"></a> Code Samples for Java Developers  
-
-You will now be able to perform different crypto operations within the Dyadic EKM system. 
-Below are code samples of using the Dyadic EKM Java provider for different common use cases.
-
-The class `com.dyadicsec.provider.DYCryptoProvider` implements the provider. Use either the `java.security` file (see the [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) for details) or create a new `DYCryptoProvider` object in code to add the Dyadic provider to your application. Enable the Dyadic provider using the following:
+The following API of JCE creates Dyadic-based Cipher object that implements all standard RSA, AES, and ECC crypto-methods (`transformations`).
 
 ```java
-Security.addProvider(new DYCryptoProvider());
+Cipher getInstance(String transformation, "DYADIC")
 ```
 
-After the new provider is added to the list of providers, use the Dyadic provider name `"DYADIC"` to create instances of `KeyStore`, `KeyGenerator`, and `Cipher` classes, which will use the underlying EKM functionality to persist keys and run crypto operations. The Dyadic `KeyStore` type is `"PKCS11"`.
+For example:
 
-Follow the standard [JCA documentation](https://docs.oracle.com/javase/8/docs/technotes/guides/security/crypto/CryptoSpec.html) to use `KeyStore`, `KeyGenerator`, and `Cipher` for generating keys.
+```java
+Cipher cipher1 = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-1ANDMGF1PADDING", "DYADIC");
+Cipher cipher2 = Cipher.getInstance("RSA/ECB/PKCS1Padding", "DYADIC")
+KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
+KeyPairGenerator gen1 = KeyPairGenerator.getInstance("RSA", "DYADIC");
+KeyPairGenerator gen2 = KeyPairGenerator.getInstance("EC", "DYADIC");
+Signature sign = Signature.getInstance("SHA256WithRSA", "DYADIC");
+```
+
+<p class="note"><strong>Note:</strong> Dyadic supports `KeyStore` of type `PKCS11`</p>
 
 
-### RSA
+## <a id="RSA"></a> RSA - Signing and Encryption
 
 The following code sample demonstrates RSA for signing and encryption:
 
 ```java
 byte[] testData = new byte[]{1, 2, 3, 4, 5};
 
-Security.addProvider(new DYCryptoProvider());
 KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
 keyStore.load(null);
 
@@ -86,12 +71,11 @@ ok = Arrays.equals(decrypted, testData);
 
 ```
 
-### ECDSA
+## <a id="ECDSA"></a> ECDSA - Key Generation
 
 The following code sample demonstrates ECDSA key generation and signature:
 
 ```java
-Security.addProvider(new DYCryptoProvider());
 KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
 keyStore.load(null);
 
@@ -117,12 +101,11 @@ boolean ok = sign.verify(signature);
 
 ```
 
-### AES
+## <a id="AES"></a> AES - Key Generation and Encryption
 
 The following code sample demonstrates AES key generation and usage:
 
 ```java
-Security.addProvider(new DYCryptoProvider());
 KeyStore keyStore = KeyStore.getInstance("PKCS11", "DYADIC");
 keyStore.load(null);
 
@@ -152,3 +135,6 @@ byte[] dec = encryptCipherDecrypt.doFinal(enc);
 
 ```
 
+## <a id="code-sample"></a> Complete Test Application
+
+See the complete application in <https://github.com/DyadicSec/dyadic-sample>.
