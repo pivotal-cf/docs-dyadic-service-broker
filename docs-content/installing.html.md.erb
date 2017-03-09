@@ -6,7 +6,7 @@ owner: Partners
 This topic describes how to activate Dyadic EKM Service Broker to serve your application in PCF Environment
 
 <p class="note">
-If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: https://info.dyadicsec.com/pivotal_eval_request
+If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: <a href="https://info.dyadicsec.com/pivotal_eval_request"> https://info.dyadicsec.com/pivotal_eval_request</a>
 </p>
 
 ##<a id='install'></a> Install and Configure Dyadic EKM Service Broker for PCF
@@ -56,16 +56,16 @@ To use the Dyadic EKM Service Broker for crypto operations, follow these steps:
 <pre class="terminal">
 System-Provided:
 {
- "VCAP_SERVICES": {
+ "VCAP\_SERVICES": {
   "dyadic-ekm": [
    {
     "credentials": {
         "ca": "-----BEGIN CERTIFICATE----- xxxx
         "key": "Bag Attributes  xxxx  -----BEGIN CERTIFICATE----- xxxx
                 Bag Attributes  xxxx  -----BEGIN ENCRYPTED PRIVATE KEY----- xxxx
-        "recv_timeout": "20000",
+        "recv\_timeout": "20000",
         "retries": "2",
-        "send_timeout": "10000",
+        "send\_timeout": "10000",
         "servers": "52.174.3.129"
 </pre>
 1. If your app is running, restage it:

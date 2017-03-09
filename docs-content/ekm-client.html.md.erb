@@ -4,13 +4,13 @@ owner: Partners
 ---
 
 This topic addresses software developers that want to perform full integration with the Dyadic solution in their development environment.
-It walks you through the steps to establish in-house setup that mimics integration with the Dyadic "Tile" in the Pivotal Cloud Foundry (**PCF**).
+It walks you through the steps to establish in-house setup that mimics integration with the Dyadic "Tile" in Pivotal Cloud Foundry (PCF).
 In addition, it provides you with a set of CLI commands for debugging and troubleshooting.
 
-However, if you are mainly interested in the samples of application code, skip this topic and continue to the <a href="./using.html">Code Samples</a>
+However, if you are mainly interested in the samples of application code, skip this topic and continue to the <a href="./using.html">Code Samples</a>.
 
 <p class="note">
-If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: https://info.dyadicsec.com/pivotal_eval_request
+If you have not already done so, please request the Dyadic Evaluation Package by completing this short form: <a href="https://info.dyadicsec.com/pivotal_eval_request">https://info.dyadicsec.com/pivotal_eval_request</a>
 </p>
 
 ## <a id='Introduction'></a> Introduction
@@ -125,7 +125,7 @@ Use the following table to install  EKM Client SW (called "dsm client") that mat
     security.provider.10=sun.security.smartcardio.SunPCSC
 ```
 <p class="note"><strong>Note</strong>
-You must renumerate all entries in the list starting with the newly inserted Provider.
+You must renumber all entries in the list starting with the newly inserted Provider.
 </p>
 
 ### <a id='Configuration'></a> Configuring the EKM Client
@@ -135,7 +135,7 @@ The configuration of the EKM Client is straightforward. It requires you to speci
 | OS      | Folder                    |
 |---------|---------------------------|
 | Linux   | Open `client.conf` file in the `/etc/dsm` folder                 |
-| Windows | Navigate to the registry key: `HKEY\_LOCAL\_MACHINE/SOFTWARE/DyadicSec/SDK` |
+| Windows | Navigate to the registry key: `HKEY_LOCAL_MACHINE/SOFTWARE/DyadicSec/SDK` |
 
 Set `servers=<EKM Server Address>`. For example:
 
@@ -333,7 +333,7 @@ Though it is highly unlikely that you will have to change the default values, th
 
 -   On Linux: edit the `client.conf` file
 
--   on Windows by adding registry keys to `HKEY\_LOCAL\_MACHINE/SOFTWARE/DyadicSec/SDK`.
+-   on Windows by adding registry keys to `HKEY_LOCAL_MACHINE/SOFTWARE/DyadicSec/SDK`.
 
 | Setting           | Description                                                                                                                                                                                                                                                                                                | Default    |
 |-------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
